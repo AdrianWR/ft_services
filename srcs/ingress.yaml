@@ -1,0 +1,27 @@
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: phippy-ingress
+spec:
+  template:
+    spec:
+      containers:
+      - name: nginx-ingress-controller
+        ports:
+         - containerPort: 20
+           hostPort: 20
+         - containerPort: 21
+           hostPort: 21
+spec:
+  backend:
+    serviceName: nginx
+    servicePort: 80
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tcp-services
+  namespace: default
+data:
+  21: “default/ftps:21021”
+  21000: “default/ftps:21000”
