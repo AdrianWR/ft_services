@@ -105,17 +105,17 @@ FTP_PASSWORD="admin"
 
 #------------- duplicate raw files --------------#
 #-- mysql
-cp ./srcs/MySQL/srcs/mysql-raw.sql ./srcs/MySQL/srcs/mysql.sql
-cp ./srcs/MySQL/srcs/setup-raw.sh ./srcs/MySQL/srcs/setup.sh
-cp ./srcs/MySQL/srcs/mysql-raw.cnf ./srcs/MySQL/srcs/mysql.cnf
+cp ./srcs/mysql/srcs/mysql-raw.sql ./srcs/mysql/srcs/mysql.sql
+cp ./srcs/mysql/srcs/setup-raw.sh ./srcs/mysql/srcs/setup.sh
+cp ./srcs/mysql/srcs/mysql-raw.cnf ./srcs/mysql/srcs/mysql.cnf
 #-- nginx
-cp ./srcs/Nginx/srcs/setup-raw.sh ./srcs/Nginx/srcs/setup.sh
-cp ./srcs/Nginx/srcs/index-raw.html ./srcs/Nginx/srcs/index.html
+#cp ./srcs/nginx/srcs/setup-raw.sh ./srcs/nginx/srcs/setup.sh
+#cp ./srcs/nginx/srcs/index-raw.html ./srcs/nginx/srcs/index.html
 #-- wordpress
-cp ./srcs/WordPress/srcs/wp-config-raw.php ./srcs/WordPress/srcs/wp-config.php
-cp ./srcs/WordPress/srcs/setup-raw.sh ./srcs/WordPress/srcs/setup.sh
-cp ./srcs/WordPress/srcs/mysql-raw.sql ./srcs/WordPress/srcs/mysql.sql
-cp ./srcs/WordPress/srcs/backup-raw.sql ./srcs/WordPress/srcs/backup.sql
+cp ./srcs/wordpress/srcs/wp-config-raw.php ./srcs/wordpress/srcs/wp-config.php
+cp ./srcs/wordpress/srcs/setup-raw.sh ./srcs/wordpress/srcs/setup.sh
+cp ./srcs/wordpress/srcs/mysql-raw.sql ./srcs/wordpress/srcs/mysql.sql
+cp ./srcs/wordpress/srcs/backup-raw.sql ./srcs/wordpress/srcs/backup.sql
 #-- ftp
 cp ./srcs/FTPS/srcs/setup-raw.sh ./srcs/FTPS/srcs/setup.sh
 #-- influxdb
@@ -124,30 +124,30 @@ cp ./srcs/influxDB/srcs/telegraf-raw.conf ./srcs/influxDB/srcs/telegraf.conf
 cp ./srcs/Grafana/srcs/datasources-raw.yml ./srcs/Grafana/srcs/datasources.yml
 #-- telegraf
 cp ./srcs/influxDB/srcs/telegraf-raw.conf ./srcs/Grafana/srcs/telegraf.conf
-cp ./srcs/influxDB/srcs/telegraf-raw.conf ./srcs/Nginx/srcs/telegraf.conf
-cp ./srcs/influxDB/srcs/telegraf-raw.conf ./srcs/MySQL/srcs/telegraf.conf
-cp ./srcs/influxDB/srcs/telegraf-raw.conf ./srcs/WordPress/srcs/telegraf.conf
+#cp ./srcs/influxDB/srcs/telegraf-raw.conf ./srcs/nginx/srcs/telegraf.conf
+cp ./srcs/influxDB/srcs/telegraf-raw.conf ./srcs/mysql/srcs/telegraf.conf
+cp ./srcs/influxDB/srcs/telegraf-raw.conf ./srcs/wordpress/srcs/telegraf.conf
 cp ./srcs/influxDB/srcs/telegraf-raw.conf ./srcs/FTPS/srcs/telegraf.conf
 
 #----------------- apply config -----------------#
 #-- mysql
-sed -i "s|__MYSQL_ROOT_PASSWORD__|${MYSQL_ROOT_PASSWORD}|g" ./srcs/MySQL/srcs/mysql.sql
-sed -i "s|__MYSQL_DATA_DIR__|${MYSQL_DATA_DIR}|g" ./srcs/MySQL/srcs/setup.sh
-sed -i "s|__MYSQL_DATA_DIR__|${MYSQL_DATA_DIR}|g" ./srcs/MySQL/srcs/mysql.cnf
+sed -i "s|__MYSQL_ROOT_PASSWORD__|${MYSQL_ROOT_PASSWORD}|g" ./srcs/mysql/srcs/mysql.sql
+sed -i "s|__MYSQL_DATA_DIR__|${MYSQL_DATA_DIR}|g" ./srcs/mysql/srcs/setup.sh
+sed -i "s|__MYSQL_DATA_DIR__|${MYSQL_DATA_DIR}|g" ./srcs/mysql/srcs/mysql.cnf
 #-- nginx
-sed -i "s|__SSH_USER__|${SSH_USER}|g" ./srcs/Nginx/srcs/setup.sh
-sed -i "s|__SSH_PASS__|${SSH_PASS}|g" ./srcs/Nginx/srcs/setup.sh
+#sed -i "s|__SSH_USER__|${SSH_USER}|g" ./srcs/nginx/srcs/setup.sh
+#sed -i "s|__SSH_PASS__|${SSH_PASS}|g" ./srcs/nginx/srcs/setup.sh
 #-- wordpress
-sed -i "s|__WORDPRESS_DB_NAME__|${WORDPRESS_DB_NAME}|g" ./srcs/WordPress/srcs/wp-config.php
-sed -i "s|__WORDPRESS_USER_NAME__|${WORDPRESS_USER_NAME}|g" ./srcs/WordPress/srcs/wp-config.php
-sed -i "s|__WORDPRESS_PASSWORD__|${WORDPRESS_PASSWORD}|g" ./srcs/WordPress/srcs/wp-config.php
-sed -i "s|__WORDPRESS_DB_HOST__|${WORDPRESS_DB_HOST}|g" ./srcs/WordPress/srcs/wp-config.php
-sed -i "s|__WORDPRESS_DB_HOST__|${WORDPRESS_DB_HOST}|g" ./srcs/WordPress/srcs/setup.sh
-sed -i "s|__MYSQL_ROOT_PASSWORD__|${MYSQL_ROOT_PASSWORD}|g" ./srcs/WordPress/srcs/setup.sh
-sed -i "s|__WORDPRESS_USER_NAME__|${WORDPRESS_USER_NAME}|g" ./srcs/WordPress/srcs/mysql.sql
-sed -i "s|__WORDPRESS_PASSWORD__|${WORDPRESS_PASSWORD}|g" ./srcs/WordPress/srcs/mysql.sql
-sed -i "s|__MINIKUBE_IP__|${MINIKUBE_IP}|g" ./srcs/WordPress/srcs/backup.sql
-sed -i "s|__WORDPRESS_DB_NAME__|${WORDPRESS_DB_NAME}|g" ./srcs/WordPress/srcs/backup.sql
+sed -i "s|__WORDPRESS_DB_NAME__|${WORDPRESS_DB_NAME}|g" ./srcs/wordpress/srcs/wp-config.php
+sed -i "s|__WORDPRESS_USER_NAME__|${WORDPRESS_USER_NAME}|g" ./srcs/wordpress/srcs/wp-config.php
+sed -i "s|__WORDPRESS_PASSWORD__|${WORDPRESS_PASSWORD}|g" ./srcs/wordpress/srcs/wp-config.php
+sed -i "s|__WORDPRESS_DB_HOST__|${WORDPRESS_DB_HOST}|g" ./srcs/wordpress/srcs/wp-config.php
+sed -i "s|__WORDPRESS_DB_HOST__|${WORDPRESS_DB_HOST}|g" ./srcs/wordpress/srcs/setup.sh
+sed -i "s|__MYSQL_ROOT_PASSWORD__|${MYSQL_ROOT_PASSWORD}|g" ./srcs/wordpress/srcs/setup.sh
+sed -i "s|__WORDPRESS_USER_NAME__|${WORDPRESS_USER_NAME}|g" ./srcs/wordpress/srcs/mysql.sql
+sed -i "s|__WORDPRESS_PASSWORD__|${WORDPRESS_PASSWORD}|g" ./srcs/wordpress/srcs/mysql.sql
+sed -i "s|__MINIKUBE_IP__|${MINIKUBE_IP}|g" ./srcs/wordpress/srcs/backup.sql
+sed -i "s|__WORDPRESS_DB_NAME__|${WORDPRESS_DB_NAME}|g" ./srcs/wordpress/srcs/backup.sql
 #-- ftps
 sed -i "s|__MINIKUBE_IP__|${MINIKUBE_IP}|g" ./srcs/FTPS/srcs/setup.sh
 sed -i "s|__FTP_USER__|${FTP_USER}|g" ./srcs/FTPS/srcs/setup.sh
@@ -157,67 +157,48 @@ sed -i "s|__MINIKUBE_IP__|${MINIKUBE_IP}|g" ./srcs/Grafana/srcs/datasources.yml
 #-- telegraf
 sed -i "s|__MINIKUBE_IP__|${MINIKUBE_IP}|g" ./srcs/influxDB/srcs/telegraf.conf
 sed -i "s|__MINIKUBE_IP__|${MINIKUBE_IP}|g" ./srcs/Grafana/srcs/telegraf.conf
-sed -i "s|__MINIKUBE_IP__|${MINIKUBE_IP}|g" ./srcs/Nginx/srcs/telegraf.conf
-sed -i "s|__MINIKUBE_IP__|${MINIKUBE_IP}|g" ./srcs/WordPress/srcs/telegraf.conf
-sed -i "s|__MINIKUBE_IP__|${MINIKUBE_IP}|g" ./srcs/MySQL/srcs/telegraf.conf
+sed -i "s|__MINIKUBE_IP__|${MINIKUBE_IP}|g" ./srcs/nginx/srcs/telegraf.conf
+sed -i "s|__MINIKUBE_IP__|${MINIKUBE_IP}|g" ./srcs/wordpress/srcs/telegraf.conf
+sed -i "s|__MINIKUBE_IP__|${MINIKUBE_IP}|g" ./srcs/mysql/srcs/telegraf.conf
 sed -i "s|__MINIKUBE_IP__|${MINIKUBE_IP}|g" ./srcs/FTPS/srcs/telegraf.conf
 
 #------------------- build containers ---------------------#
 
 eval $(minikube docker-env)
 
-echo -e "${GREEN}Building Containers... this may take a while...${NC}";
-echo -e "${MAGENTA}Mysql...${NC}";
-docker build -t phippy-mysql srcs/MySQL
-kubectl apply -f srcs/mysql.yaml
-while [[ $(kubectl get pods -l app=mysql -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}') != "True" ]]; do echo "waiting for pod" && sleep 1; done
-sleep 10;
-echo -e "${MAGENTA}Nginx...${NC}";
-docker build -t phippy-nginx srcs/Nginx
-echo -e "${MAGENTA}Wordpress...${NC}";
-docker build -t phippy-wordpress srcs/WordPress
-echo -e "${MAGENTA}Influxdb...${NC}";
-docker build -t phippy-influxdb srcs/influxDB
-echo -e "${MAGENTA}Ftp...${NC}";
-docker build -t phippy-ftps srcs/FTPS
-echo -e "${MAGENTA}Grafana...${NC}";
-docker build -t phippy-grafana srcs/Grafana
+#echo -e "${GREEN}Building Containers... this may take a while...${NC}";
+#echo -e "${MAGENTA}Mysql...${NC}";
+#docker build -t phippy-mysql srcs/mysql
+#kubectl apply -f srcs/mysql.yaml
+#while [[ $(kubectl get pods -l app=mysql -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}') != "True" ]]; do echo "waiting for pod" && sleep 1; done
+#sleep 10;
+#echo -e "${MAGENTA}nginx...${NC}";
+docker build -t phippy-nginx srcs/nginx
+#echo -e "${MAGENTA}Wordpress...${NC}";
+#docker build -t phippy-wordpress srcs/wordpress
+#echo -e "${MAGENTA}Influxdb...${NC}";
+#docker build -t phippy-influxdb srcs/influxDB
+#echo -e "${MAGENTA}Ftp...${NC}";
+#docker build -t phippy-ftps srcs/FTPS
+#echo -e "${MAGENTA}Grafana...${NC}";
+#docker build -t phippy-grafana srcs/Grafana
 
 #------------------- remove temps --------------------#
 #-- mysql
-rm ./srcs/MySQL/srcs/mysql.sql
-rm ./srcs/MySQL/srcs/setup.sh
-rm ./srcs/MySQL/srcs/mysql.cnf
+rm ./srcs/mysql/srcs/mysql.sql
+rm ./srcs/mysql/srcs/setup.sh
+rm ./srcs/mysql/srcs/mysql.cnf
 #-- nginx
-rm ./srcs/Nginx/srcs/setup.sh
-rm ./srcs/Nginx/srcs/index.html
+rm ./srcs/nginx/srcs/setup.sh
+rm ./srcs/nginx/srcs/index.html
 #-- wordpress
-rm ./srcs/WordPress/srcs/wp-config.php
-rm ./srcs/WordPress/srcs/setup.sh
-rm ./srcs/WordPress/srcs/mysql.sql
-rm ./srcs/WordPress/srcs/backup.sql
+rm ./srcs/wordpress/srcs/wp-config.php
+rm ./srcs/wordpress/srcs/setup.sh
+rm ./srcs/wordpress/srcs/mysql.sql
+rm ./srcs/wordpress/srcs/backup.sql
 
 #------------------- apply YAMLs ---------------------#
 
-echo -e "${GREEN}Applying YAMLs...${NC}";
-echo -e "${MAGENTA}"
 
-sleep 10;
 kubectl apply -f srcs/nginx.yaml
-while [[ $(kubectl get pods -l app=nginx -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}') != "True" ]]; do echo "waiting for pod" && sleep 1; done
-sleep 10;
-kubectl apply -f srcs/wordpress.yaml
-while [[ $(kubectl get pods -l app=wordpress -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}') != "True" ]]; do echo "waiting for pod" && sleep 1; done
-sleep 10;
-kubectl apply -f srcs/ftps.yaml
-kubectl apply -f srcs/influxdb.yaml
-while [[ $(kubectl get pods -l app=influxdb -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}') != "True" ]]; do echo "waiting for pod" && sleep 1; done
-sleep 10;
-kubectl apply -f srcs/grafana.yaml
-while [[ $(kubectl get pods -l app=grafana -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}') != "True" ]]; do echo "waiting for pod" && sleep 1; done
-sleep 10;
-kubectl apply -f srcs/ingress.yaml
-echo -e "${NC}";
-echo -e "${GREEN}Starting Dashboard...${NC}";
-
 #minikube dashboard

@@ -5,14 +5,15 @@ RUN apk add --no-cache openssh-server
 RUN apk add --no-cache telegraf \
     --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing/
 
-EXPOSE 80 443 1234
-COPY ./srcs/ /root/
+COPY ./srcs/nginx.conf /etc/nginx/conf.d/default.conf
+COPY ./srcs/index.html /var/www/html/
+COPY ./srcs/setup.sh /tmp/
+COPY ./srcs/telegraf.conf /etc/
 
-RUN chmod 755 root/setup.sh
-RUN mv /root/nginx.conf /etc/nginx/conf.d/default.conf
+RUN chmod 755 tmp/setup.sh
 RUN mkdir -p /ssl/
 RUN openssl req -x509 -nodes -newkey rsa:2048 -keyout /ssl/cert.key -out /ssl/cert.crt -days 365 -subj '/CN=localhost'
 
-RUN mkdir -p /var/www/html
-RUN mv /root/index.html /var/www/html/
-ENTRYPOINT ["/root/setup.sh"]
+EXPOSE 80 443 1234
+
+ENTRYPOINT ["/tmp/setup.sh"]

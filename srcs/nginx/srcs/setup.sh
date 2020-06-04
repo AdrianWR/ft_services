@@ -1,6 +1,4 @@
-#! /bin/sh
-SSH_USER=__SSH_USER__
-SSH_PASS=__SSH_PASS__
+#!/bin/sh
 
 ssh-keygen -A
 adduser --disabled-password ${SSH_USER}

@@ -8,4 +8,4 @@ datasources:
   isDefault: true
   user: root
   password: password
-  url: http://192.168.99.127:8086
+  url: http://192.168.99.132:8086
