@@ -17,11 +17,18 @@ spec:
     spec:
       containers:
       - name: nginx
-        image: phippy-nginx
+        image: nginx-image
         imagePullPolicy: Never
         envFrom:
         - configMapRef:
             name: nginx-config
+        volumeMounts:
+        - name: telegraf-config
+          mountPath: /etc
+      volumes:
+      - name: telegraf-config 
+        configMap:
+          name: telegraf-config-file
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -32,6 +39,16 @@ data:
   SSH_USER: admin
   SSH_PASS: admin
 ---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: telegraf-config-file
+data:
+  telegraf.conf: |
+    [[outputs.influxdb]]
+      database = "telegraf"
+      urls = ["__INFLUXDB_PORT__"]
+---
 kind: Service
 apiVersion: v1
 metadata:
@@ -39,14 +56,13 @@ metadata:
   labels:
     app: nginx
 spec:
-  type: NodePort
+  type: ClusterIP
   selector:
     app: nginx
   ports:
-    - port: 80
-      name: http
-    - port: 443
-      name: https
-    - port: 22000
-      name: ssh
-      nodePort: 22000
+  - name: http
+    port: 80
+  - name: https
+    port: 443
+  - name: ssh
+    port: 22

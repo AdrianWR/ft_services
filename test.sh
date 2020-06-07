@@ -7,33 +7,24 @@ PODS=(
 	 )
 
 # Build container image and execute its pod.
+# If a previous pod was running, remove it
+# at manifest application to restart the pod
 #
 # @$1: Service to be built and run.
 function launch()
 {
-	if [ -z $1 ]
-	then
-		echo "Argument not suitable to be launched."
-		return 1
-	fi
-
+	errlog=$(mktemp)
+	kubectl get pods -l app=$1 2> $errlog
 	docker build -t image-$1 ./srcs/$1
-
-	if [ $? -ne 0 ]
-	then
-		echo "Error found in building $1 image"
-		echo "Return Code: $?"
-		return $?
+	kubectl apply -f ./srcs/$1.yaml
+	if [[ -s $errlog ]]; then
+		echo "Pod started!"
+	else
+		kubectl delete pod -n default -l app=$1
+		echo "Pod restarted!"
 	fi
+	rm -f $errlog
 	return 0
 }
 
-#for pod in $PODS;
-#do
-#	docker build -t phippy-$pod ./srcs/$pod
-#	echo $pod
-#done
-
 "$@"
-
-launch nginx

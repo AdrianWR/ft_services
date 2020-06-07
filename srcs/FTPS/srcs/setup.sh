@@ -11,4 +11,4 @@ chmod 600 /etc/ssl/private/pure-ftpd.pem
 adduser -h /ftps/$FTP_USER -D $FTP_USER
 echo "$FTP_USER:$FTP_PASSWORD" | chpasswd
 
-telegraf & /usr/sbin/pure-ftpd -j -Y 1 -p 21000:21000 -P "192.168.99.132"
+telegraf & /usr/sbin/pure-ftpd -j -Y 1 -p 21000:21000 -P "192.168.99.134"
