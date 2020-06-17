@@ -1,22 +1,33 @@
 #!/bin/sh
 
-mkdir -p /run/lighttpd
-touch /run/lighttpd/php-fastcgi.socket
-chown -R lighttpd:lighttpd /run/lighttpd
-mv /tmp/lighttpd.conf /etc/lighttpd/lighttpd.conf
-mv /tmp/mod_fastcgi.conf /etc/lighttpd/mod_fastcgi.conf
-
-if [ ! -d /var/www/wp-admin ]
-then
-    tar -zxvf /tmp/wordpress.tar.gz -C /tmp
-    cp -r /tmp/wordpress/* /var/www/
-    mv /tmp/wp-config.php /var/www/
-    mysql -h 192.168.99.134 -uroot -padmin < /tmp/mysql.sql
-    mysql -h 192.168.99.134 -uroot -padmin < /tmp/backup.sql
+if [[ ! -d /var/run/lighttpd ]]; then
+	mkdir -p /var/run/lighttpd
+	chown -R lighttpd:lighttpd /var/run/lighttpd
 fi
 
-chmod -R 755 /var/www/
-chown lighttpd -R /var/www/
+sed -i '/"mod_rewrite"/s/^#*\s*//g' /etc/lighttpd/lighttpd.conf
+sed -i '/"mod_redirect"/s/^#*\s*//g' /etc/lighttpd/lighttpd.conf
+sed -i '/"mod_alias"/s/^#*\s*//g' /etc/lighttpd/lighttpd.conf
+sed -i '/"mod_fastcgi.conf"/s/^#*\s*//g' /etc/lighttpd/lighttpd.conf
+sed -i '/bin-path/s/\<php-cgi\>/php-cgi7/g' /etc/lighttpd/mod_fastcgi.conf
 
-export TELEGRAF_CONFIG_PATH=/etc/telegraf.conf
-telegraf & /usr/sbin/lighttpd -D -f /etc/lighttpd/lighttpd.conf
+if [[ ! -f /var/www/localhost/htdocs/index.php ]]; then
+
+	tar -xf /tmp/wordpress-$WP_VERSION.tar.gz -C /var/www/localhost/htdocs --strip 1
+
+	tfile=`mktemp`
+	cat > $tfile << EOF
+CREATE DATABASE IF NOT EXISTS wordpress;
+GRANT ALL PRIVILEGES ON wordpress.* TO '$WORDPRESS_USERNAME'@'localhost' IDENTIFIED BY '$WORDPRESS_PASSWORD';
+FLUSH PRIVILEGES;
+EOF
+
+	mysql -hmysql -uroot -p$MYSQL_ROOT_PASSWORD < $tfile
+	rm -f $tfile
+
+fi
+
+chmod -R 755 /var/www/localhost/htdocs
+chown -R root:root /var/www/localhost
+
+/usr/sbin/lighttpd -D -f /etc/lighttpd/lighttpd.conf
