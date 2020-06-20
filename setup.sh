@@ -11,21 +11,16 @@ function launch()
 	errlog=$(mktemp)
 	kubectl get pods -l app=$1 2> $errlog
 	docker build -t $1-image $2 ./srcs/$1
-	kubectl apply -f ./srcs/$1.yaml
+	kubectl apply -f ./srcs/$1/$1.yaml
 	if [[ -s $errlog ]]; then
 		echo "Pod started!"
 	else
 		kubectl delete pod -n default -l app=$1
-		#kubectl rollout restart deployment $1
-		#kubectl scale deployment $1 --replicas=0
-		#kubectl scale deployment $1 --replicas=1
 		echo "Pod restarted!"
 	fi
 	rm -f $errlog
 	return 0
 }
-
-"$@"
 
 #----------------- set colors -------------------#
 ORANGE="\033[0;31m "
@@ -102,32 +97,19 @@ if [[ "$1" == "ignite" ]]; then
 
 fi
 
+#------------------- apply yamls ---------------------#
+
 eval $(minikube docker-env)
 
-#----------------- main config ------------------#
-#
-SYSTEM_TYPE="linux"
-MYSQL_ROOT_PASSWORD="admin"
-MYSQL_DATA_DIR="/data"
-#SSH_USER="admin"
-#SSH_PASS="admin"
-MINIKUBE_IP=$(minikube ip)
-WORDPRESS_DB_NAME="wordpress"
-WORDPRESS_USER_NAME="admin"
-WORDPRESS_PASSWORD="admin"
-WORDPRESS_DB_HOST=$MINIKUBE_IP
-FTP_USER="admin"
-FTP_PASSWORD="admin"
+kubectl apply -f srcs/telegraf.yaml
+#launch influxdb
+launch mysql
+launch phpmyadmin
+launch wordpress
+launch nginx 
 
-#------------------- build containers ---------------------#
-
-#docker build -t phippy-nginx srcs/nginx
-
-#------------------- apply yamls ---------------------#
 kubectl wait --namespace=kube-system --for=condition=Ready pods --all --timeout 10s
 kubectl apply -f srcs/ingress.yaml
 kubectl patch deployment ingress-nginx-controller --patch "$(cat ./srcs/nginx-ingress-controller-patch.yaml)" -n kube-system
-launch influxdb
-launch nginx 
 
 #minikube dashboard

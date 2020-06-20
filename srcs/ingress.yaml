@@ -8,12 +8,12 @@ spec:
       containers:
       - name: nginx-ingress-controller
         ports:
-         - containerPort: 20
-           hostPort: 20
-         - containerPort: 21
-           hostPort: 21
-         - containerPort: 22
-           hostPort: 22000
+        - containerPort: 20
+          hostPort: 20
+        - containerPort: 21
+          hostPort: 21
+        - containerPort: 22
+          hostPort: 22000
 spec:
   backend:
     serviceName: nginx
