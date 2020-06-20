@@ -1,0 +1,138 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wordpress
+  labels:
+    app: wordpress
+spec:
+  selector:
+    matchLabels:
+      app: wordpress
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: wordpress
+    spec:
+      containers:
+      - name: wordpress
+        image: wordpress-image
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 80
+        env:
+        - name: TELEGRAF_CONFIG_PATH
+          valueFrom:
+            configMapKeyRef:
+              name: telegraf-config
+              key: TELEGRAF_CONFIG_PATH
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mysql-secret
+              key: password
+        - name: WORDPRESS_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: wordpress-secret
+              key: username
+        - name: WORDPRESS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: wordpress-secret
+              key: password
+        volumeMounts:
+        - name: telegraf-config
+          mountPath: /etc/telegraf.conf
+          subPath: telegraf.conf
+        - name: wp-config
+          mountPath: /var/www/localhost/htdocs/wp-config.php
+          subPath: wp-config.php
+        - name: wordpress-persistent-storage
+          mountPath: /var/www/localhost/htdocs
+          subPath: htdocs
+      volumes:
+      - name: telegraf-config
+        configMap:
+          name: telegraf-config
+          items:
+          - key: telegraf.conf
+            path: telegraf.conf
+      - name: wp-config
+        configMap:
+          name: wordpress-config
+          items:
+          - key: wp-config.php
+            path: wp-config.php
+      - name: wordpress-persistent-storage
+        persistentVolumeClaim:
+          claimName: wordpress-pv-claim
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: wordpress
+  labels:
+    app: wordpress
+spec:
+  type: NodePort
+  ports:
+  - name: wordpress
+    protocol: TCP
+    port: 5050
+    targetPort: 80
+    nodePort: 5050
+  selector:
+    app: wordpress
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: wordpress-config
+data:
+  wp-config.php: |
+    <?php
+    define( 'WP_SITEURL',       '/wordpress/'  );
+    define( 'WP_HOME',          '/wordpress/'  );
+    define( 'DB_NAME',          'wordpress'  );
+    define( 'DB_USER',          'root'  );
+    define( 'DB_PASSWORD',      'admin'  );
+    define( 'DB_HOST',          'mysql'  );
+    define( 'DB_CHARSET',       'utf8mb4'  );
+    define( 'DB_COLLATE',       ''  );
+    define( 'AUTH_KEY',         '' );
+    define( 'SECURE_AUTH_KEY',  '' );
+    define( 'LOGGED_IN_KEY',    '' );
+    define( 'SECURE_AUTH_SALT', '' );
+    define( 'LOGGED_IN_SALT',   '' );
+    define( 'NONCE_SALT',       '' );
+    $table_prefix = 'wp_';
+    define( 'WP_DEBUG', false  );
+    if ( ! defined( 'ABSPATH'  )  ) {
+            define( 'ABSPATH', __DIR__ . '/'  );
+    }
+    require_once ABSPATH . 'wp-settings.php';
+    $_SERVER['REQUEST_URI'] = str_replace("/wp-admin/", "/wordpress/wp-admin/", $_SERVER['REQUEST_URI']);
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: wordpress-pv-claim
+  labels:
+    app: wordpress
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: wordpress-secret
+type: Opaque
+data:
+  username: YWRtaW4=
+  password: YWRtaW4=
