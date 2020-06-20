@@ -1,10 +1,9 @@
-FROM alpine
+FROM alpine:3.11.6
 
-RUN apk add --no-cache nginx
-RUN apk add --no-cache openssl
-RUN apk add --no-cache openssh-server
-RUN apk add --no-cache telegraf \
-    --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing/
+RUN apk update
+RUN apk add nginx openssl openssh-server
+#RUN apk add --no-cache telegraf \
+#    --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing/
 
 COPY ./srcs/nginx.conf /etc/nginx/conf.d/default.conf
 COPY ./srcs/index.html /var/www/html/

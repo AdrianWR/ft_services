@@ -1,0 +1,98 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx
+  labels:
+    app: nginx
+spec:
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx-image
+        imagePullPolicy: Never
+        volumeMounts:
+        - name: telegraf-config
+          mountPath: /etc/telegraf.conf
+          subPath: telegraf.conf
+        - name: nginx-config
+          mountPath: /etc/nginx/conf.d
+      volumes:
+      - name: telegraf-config 
+        configMap:
+          name: telegraf-config
+      - name: nginx-config
+        configMap:
+          name: nginx-config
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: nginx
+  labels:
+    app: nginx
+spec:
+  type: ClusterIP
+  selector:
+    app: nginx
+  ports:
+  - name: http
+    port: 80
+  - name: https
+    port: 443
+  - name: ssh
+    port: 22
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-config
+  namespace: default
+data:
+  default.conf: |
+    server {
+        listen  80;
+        listen  [::]:80;
+        #return  301 https://$host$request_uri;
+    }
+
+    server {
+        listen 443 ssl;
+        listen [::]:443 ssl;
+
+        server_name           _;
+        ssl_certificate       /ssl/cert.crt;
+        ssl_certificate_key   /ssl/cert.key;
+        index                 index.html;
+        root                  /var/www/html;
+
+        location / {
+            try_files $uri $uri/ =404;
+        }
+
+        location /wordpress/ {
+            proxy_pass          http://wordpress:5050/;
+            proxy_set_header    Host $host;
+            proxy_set_header    X-Real-IP $host;
+            proxy_set_header    X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header    X-Forwarded-Proto $scheme;
+            proxy_set_header    X-Forwarded-Host $host;
+        }
+
+        location /phpmyadmin/ {
+            proxy_pass          http://phpmyadmin:5000/;
+            proxy_set_header    Host $host;
+            proxy_set_header    X-Real-IP $host;
+            proxy_set_header    X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header    X-Forwarded-Proto $scheme;
+            proxy_set_header    X-Forwarded-Host $host;
+        }
+    }
