@@ -1,0 +1,84 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: influxdb
+  labels:
+    app: influxdb
+spec:
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: influxdb
+  template:
+    metadata:
+      labels:
+        app: influxdb
+    spec:
+      containers:
+      - name: influxdb
+        image: influxdb-image
+        imagePullPolicy: Never
+        volumeMounts:
+        - name: telegraf-config
+          mountPath: /etc/telegraf.conf
+          subPath: telegraf.conf
+        - name: influxdb-config
+          mountPath: /etc/influxdb.conf
+          subPath: influxdb.conf
+        - name: influxdb-persistent-storage
+          mountPath: /influxdata
+      volumes:
+      - name: telegraf-config
+        configMap:
+          name: telegraf-config
+      - name: influxdb-config
+        configMap:
+          name: influxdb-config
+      - name: influxdb-persistent-storage
+        persistentVolumeClaim:
+          claimName: influxdb-pv-claim
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: influxdb
+  labels:
+    app: influxdb
+spec:
+  type: ClusterIP
+  selector:
+    app: influxdb
+  ports:
+  - name: influxdb-port-1
+    port: 8086
+  - name: influxdb-port-2
+    port: 8088
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: influxdb-config
+  namespace: default
+data:
+  influxdb.conf: |
+    [meta]
+      dir = "/influxdata/meta"
+    [data]
+      dir = "/influxdata/data"
+      wal-dir = "/influxdata/wal"
+    [http]
+      enabled = true
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: influxdb-pv-claim
+  labels:
+    app: influxdb
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
