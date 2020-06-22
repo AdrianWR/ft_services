@@ -6,7 +6,7 @@ PODS=(
 		wordpress
 	 )
 
-function launch()
+function deploy()
 {
 	errlog=$(mktemp)
 	kubectl get pods -l app=$1 2> $errlog
@@ -94,6 +94,10 @@ if [[ "$1" == "ignite" ]]; then
 	minikube addons enable ingress
 	minikube addons enable dashboard
 	minikube addons enable metrics-server
+	kubectl wait --namespace kube-system \
+		  		 --for=condition=ready pod \
+		    	 --selector=app.kubernetes.io/component=controller \
+			  	 --timeout=120s
 
 fi
 
@@ -102,13 +106,12 @@ fi
 eval $(minikube docker-env)
 
 kubectl apply -f srcs/telegraf.yaml
-#launch influxdb
-launch mysql
-launch phpmyadmin
-launch wordpress
-launch nginx 
+#deploy influxdb
+deploy mysql
+deploy phpmyadmin
+deploy wordpress
+deploy nginx 
 
-kubectl wait --namespace=kube-system --for=condition=Ready pods --all --timeout 10s
 kubectl apply -f srcs/ingress.yaml
 kubectl patch deployment ingress-nginx-controller --patch "$(cat ./srcs/nginx-ingress-controller-patch.yaml)" -n kube-system
 
