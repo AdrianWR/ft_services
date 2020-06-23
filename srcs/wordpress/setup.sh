@@ -5,9 +5,9 @@ if [[ ! -d /var/run/lighttpd ]]; then
 	chown -R lighttpd:lighttpd /var/run/lighttpd
 fi
 
-sed -i '/"mod_rewrite"/s/^#*\s*//g' /etc/lighttpd/lighttpd.conf
-sed -i '/"mod_redirect"/s/^#*\s*//g' /etc/lighttpd/lighttpd.conf
-sed -i '/"mod_alias"/s/^#*\s*//g' /etc/lighttpd/lighttpd.conf
+#sed -i '/"mod_rewrite"/s/^#*\s*//g' /etc/lighttpd/lighttpd.conf
+#sed -i '/"mod_redirect"/s/^#*\s*//g' /etc/lighttpd/lighttpd.conf
+#sed -i '/"mod_alias"/s/^#*\s*//g' /etc/lighttpd/lighttpd.conf
 sed -i '/"mod_fastcgi.conf"/s/^#*\s*//g' /etc/lighttpd/lighttpd.conf
 sed -i '/bin-path/s/\<php-cgi\>/php-cgi7/g' /etc/lighttpd/mod_fastcgi.conf
 

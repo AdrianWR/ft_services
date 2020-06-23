@@ -20,20 +20,12 @@ spec:
         image: mysql-image
         imagePullPolicy: Never
         env:
-        - name: TELEGRAF_CONFIG_PATH
-          valueFrom:
-            configMapKeyRef:
-              name: telegraf-config
-              key: TELEGRAF_CONFIG_PATH
         - name: MYSQL_ROOT_PASSWORD
           valueFrom:
             secretKeyRef:
               name: mysql-secret
               key: password
         volumeMounts:
-        - name: telegraf-config
-          mountPath: /etc/telegraf.conf
-          subPath: telegraf.conf
         - name: mysql-config
           mountPath: /etc/my.cnf.d/mariadb-server.cnf
           subPath: mariadb-server.cnf
@@ -41,12 +33,6 @@ spec:
           mountPath: /data
           subPath: mysql
       volumes:
-      - name: telegraf-config
-        configMap:
-          name: telegraf-config
-          items:
-          - key: telegraf.conf
-            path: telegraf.conf
       - name: mysql-config
         configMap:
           name: mysql-config

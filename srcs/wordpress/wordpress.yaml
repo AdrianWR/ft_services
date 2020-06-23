@@ -22,11 +22,6 @@ spec:
         ports:
         - containerPort: 80
         env:
-        - name: TELEGRAF_CONFIG_PATH
-          valueFrom:
-            configMapKeyRef:
-              name: telegraf-config
-              key: TELEGRAF_CONFIG_PATH
         - name: MYSQL_ROOT_PASSWORD
           valueFrom:
             secretKeyRef:
@@ -43,9 +38,6 @@ spec:
               name: wordpress-secret
               key: password
         volumeMounts:
-        - name: telegraf-config
-          mountPath: /etc/telegraf.conf
-          subPath: telegraf.conf
         - name: wp-config
           mountPath: /var/www/localhost/htdocs/wp-config.php
           subPath: wp-config.php
@@ -53,12 +45,6 @@ spec:
           mountPath: /var/www/localhost/htdocs
           subPath: htdocs
       volumes:
-      - name: telegraf-config
-        configMap:
-          name: telegraf-config
-          items:
-          - key: telegraf.conf
-            path: telegraf.conf
       - name: wp-config
         configMap:
           name: wordpress-config
@@ -93,8 +79,8 @@ metadata:
 data:
   wp-config.php: |
     <?php
-    define( 'WP_SITEURL',       '/wordpress/'  );
-    define( 'WP_HOME',          '/wordpress/'  );
+    /*define( 'WP_SITEURL',       '/wordpress/'  );
+    define( 'WP_HOME',          '/wordpress/'  );*/
     define( 'DB_NAME',          'wordpress'  );
     define( 'DB_USER',          'root'  );
     define( 'DB_PASSWORD',      'admin'  );
@@ -110,10 +96,12 @@ data:
     $table_prefix = 'wp_';
     define( 'WP_DEBUG', false  );
     if ( ! defined( 'ABSPATH'  )  ) {
-            define( 'ABSPATH', __DIR__ . '/'  );
+      define( 'ABSPATH', __DIR__ . '/'  );
     }
     require_once ABSPATH . 'wp-settings.php';
-    $_SERVER['REQUEST_URI'] = str_replace("/wp-admin/", "/wordpress/wp-admin/", $_SERVER['REQUEST_URI']);
+    if ( ! empty( $_SERVER['HTTP_X_FORWARDED_HOST']  )  ) {
+      $_SERVER['HTTP_HOST'] = $_SERVER['HTTP_X_FORWARDED_HOST'];
+    }
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim

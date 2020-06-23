@@ -20,15 +20,9 @@ spec:
         image: nginx-image
         imagePullPolicy: Never
         volumeMounts:
-        - name: telegraf-config
-          mountPath: /etc/telegraf.conf
-          subPath: telegraf.conf
         - name: nginx-config
           mountPath: /etc/nginx/conf.d
       volumes:
-      - name: telegraf-config 
-        configMap:
-          name: telegraf-config
       - name: nginx-config
         configMap:
           name: nginx-config
@@ -40,7 +34,7 @@ metadata:
   labels:
     app: nginx
 spec:
-  type: ClusterIP
+  type: LoadBalancer
   selector:
     app: nginx
   ports:
@@ -59,7 +53,11 @@ metadata:
 data:
   default.conf: |
     server {
-
+        listen 80       default_server;
+        listen [::]:80  default_server;
+        return 301 https://$host$request_uri;
+    }
+    server {
         listen  443 ssl;
         listen  [::]:443 ssl;
 
@@ -69,26 +67,22 @@ data:
         index                 index.html;
         root                  /var/www/html;
 
-        #location / {
-        #    try_files $uri $uri/ =404;
-        #}
+        location / {
+            try_files $uri $uri/ =404;
+        }
 
-        #location /wordpress/ {
-        #    proxy_pass          http://wordpress:5050/;
-        #    proxy_set_header    Host $host;
-        #    proxy_set_header    X-Real-IP $host;
-        #    proxy_set_header    X-Forwarded-For $proxy_add_x_forwarded_for;
-        #    proxy_set_header    X-Forwarded-Proto $scheme;
-        #    proxy_set_header    X-Forwarded-Host $host;
-        #}
+        location /wordpress/ {
+            proxy_pass          http://wordpress:5050/;
+            rewrite ^([^.]*[^/])$ $1/ permanent;
+        }
 
         location /phpmyadmin/ {
             proxy_pass          http://phpmyadmin:5000/;
-            proxy_set_header    Host $host;
-            proxy_set_header    X-Real-IP $host;
-            proxy_set_header    X-Forwarded-For $proxy_add_x_forwarded_for;
-            proxy_set_header    X-Forwarded-Proto $scheme;
-            proxy_set_header    X-Forwarded-Host $host;
         }
-
     }
+  proxy.conf:
+    proxy_set_header    Host $host;
+    proxy_set_header    X-Real-IP $host;
+    proxy_set_header    X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header    X-Forwarded-Proto $scheme;
+    proxy_set_header    X-Forwarded-Host $host;
