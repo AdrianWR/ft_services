@@ -19,6 +19,17 @@ spec:
       - name: nginx
         image: nginx-image
         imagePullPolicy: Never
+        env:
+        - name: SSH_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: ssh-secret
+              key: username
+        - name: SSH_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: ssh-secret
+              key: password
         volumeMounts:
         - name: nginx-config
           mountPath: /etc/nginx/conf.d
@@ -46,6 +57,14 @@ spec:
     port: 22
 ---
 apiVersion: v1
+kind: Secret
+metadata:
+  name: ssh-secret
+data:
+  username: YWRtaW4=
+  password: YWRtaW4=
+---
+apiVersion: v1
 kind: ConfigMap
 metadata:
   name: nginx-config
@@ -55,11 +74,11 @@ data:
     server {
         listen 80       default_server;
         listen [::]:80  default_server;
-        return 301 https://$host$request_uri;
+        return 301      https://$host$request_uri;
     }
     server {
-        listen  443 ssl;
-        listen  [::]:443 ssl;
+        listen  443         ssl;
+        listen  [::]:443    ssl;
 
         server_name           _;
         ssl_certificate       /ssl/cert.crt;
@@ -72,12 +91,18 @@ data:
         }
 
         location /wordpress/ {
-            proxy_pass          http://wordpress:5050/;
-            rewrite ^([^.]*[^/])$ $1/ permanent;
+            proxy_pass  http://wordpress:5050/;
+            rewrite     ^([^.]*[^/])$ $1/ permanent;
         }
 
         location /phpmyadmin/ {
-            proxy_pass          http://phpmyadmin:5000/;
+            proxy_pass  http://phpmyadmin:5000/;
+        }
+
+        location /grafana/ {
+            proxy_pass          http://grafana:3000/;
+            rewrite             ^/grafana/(.*) /$1 break;
+            proxy_set_header    X-WEBAUTH-USER admin;
         }
     }
   proxy.conf:
