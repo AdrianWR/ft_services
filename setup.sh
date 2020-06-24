@@ -88,16 +88,18 @@ if [[ "$1" == "ignite" ]]; then
 	#sudo usermod -aG docker $USER
 
 	#--------------- start minikube -----------------#
-
 	echo -e "${GREEN}Starting Minikube...${NC}"
-	minikube start --driver=virtualbox --extra-config=apiserver.service-node-port-range=3000-35000
-	minikube addons enable ingress
+	minikube start --driver=virtualbox		\
+				   --extra-config=apiserver.service-node-port-range=3000-35000
+				   #--bootstrapper=kubeadm	\
+	  		       #--extra-config=kubelet.authentication-token-webhook=true \
+	  			   #--extra-config=kubelet.rotate-server-certificates=true	\
 	minikube addons enable dashboard
 	minikube addons enable metrics-server
-	kubectl wait --namespace kube-system \
-		  		 --for=condition=ready pod \
-		    	 --selector=app.kubernetes.io/component=controller \
-			  	 --timeout=120s
+
+	kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.9.3/manifests/namespace.yaml
+	kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.9.3/manifests/metallb.yaml
+	kubectl create secret generic -n metallb-system memberlist --from-literal=secretkey="$(openssl rand -base64 128)"
 
 fi
 
@@ -105,14 +107,12 @@ fi
 
 eval $(minikube docker-env)
 
-kubectl apply -f srcs/telegraf.yaml
-#deploy influxdb
+kubectl apply -f ./srcs/metallb/metallb.yaml
 deploy mysql
 deploy phpmyadmin
 deploy wordpress
 deploy nginx 
-
-kubectl apply -f srcs/ingress.yaml
-kubectl patch deployment ingress-nginx-controller --patch "$(cat ./srcs/nginx-ingress-controller-patch.yaml)" -n kube-system
+deploy influxdb
+deploy grafana
 
 #minikube dashboard
