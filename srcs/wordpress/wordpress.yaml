@@ -62,13 +62,10 @@ metadata:
   labels:
     app: wordpress
 spec:
-  type: NodePort
   ports:
   - name: wordpress
-    protocol: TCP
     port: 5050
     targetPort: 80
-    nodePort: 5050
   selector:
     app: wordpress
 ---
