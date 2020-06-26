@@ -84,7 +84,7 @@ data:
         ssl_certificate       /ssl/cert.crt;
         ssl_certificate_key   /ssl/cert.key;
         index                 index.html;
-        root                  /var/www/html;
+        root                  /var/www/localhost/htdocs;
 
         location / {
             try_files $uri $uri/ =404;
