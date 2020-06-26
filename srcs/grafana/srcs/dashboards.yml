@@ -1,7 +1,7 @@
 apiVersion: 1
 
 providers:
-- name: 'phippy'
+- name: 'influxdb'
   orgId: 1
   folder: ''
   folderUid: ''
@@ -9,6 +9,6 @@ providers:
   disableDeletion: false
   editable: true
   updateIntervalSeconds: 10
-  allowUiUpdates: false
+  allowUiUpdates: true
   options:
-    path: /var/lib/grafana/dashboards
+    path: /usr/share/grafana/public/dashboards
