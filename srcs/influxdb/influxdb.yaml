@@ -1,3 +1,15 @@
+# **************************************************************************** #
+#                                                                              #
+#                                                         :::      ::::::::    #
+#    influxdb.yaml                                      :+:      :+:    :+:    #
+#                                                     +:+ +:+         +:+      #
+#    By: aroque <aroque@student.42sp.org.br>        +#+  +:+       +#+         #
+#                                                 +#+#+#+#+#+   +#+            #
+#    Created: 2020/06/26 17:14:18 by aroque            #+#    #+#              #
+#    Updated: 2020/06/27 18:19:17 by aroque           ###   ########.fr        #
+#                                                                              #
+# **************************************************************************** #
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -20,6 +32,15 @@ spec:
       - name: influxdb
         image: influxdb-image
         imagePullPolicy: Never
+        env:
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: HOSTNAME 
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
         volumeMounts:
         - name: influxdb-config
           mountPath: /etc/influxdb.conf
@@ -74,12 +95,15 @@ metadata:
   name: telegraf-config
   namespace: default
 data:
+  kubernetes.conf: |
+    [[inputs.kubernetes]]
+    url = "https://$HOST_IP:10250"
+    label_include = ["kubernetes_pod_container"]
+    insecure_skip_verify = true
   kube_inventory.conf: |
     [[inputs.kube_inventory]]
     url = "https://kubernetes"
-    namespace = "default"
-    bearer_token = "/run/secrets/kubernetes.io/serviceaccount/token"
-    resource_include = ["pods"]
+    resource_include = ["kubernetes_pod_container"]
     insecure_skip_verify = true
 ---
 apiVersion: v1
@@ -95,46 +119,46 @@ spec:
     requests:
       storage: 1Gi
 ---
-kind: ClusterRole
-apiVersion: rbac.authorization.k8s.io/v1
-metadata:
-  name: influx:cluster:viewer
-  labels:
-    rbac.authorization.k8s.io/aggregate-view-telegraf: "true"
-rules:
-  - apiGroups: [""]
-    resources: 
-    - persistentvolumes
-    - nodes
-    - deployments
-    - services
-    - pods
-    - statefulsets
-    - daemonsets
-    - persistentvolumeclaims
-    - ingresses
-    verbs: ["get", "list"]
----
-kind: ClusterRole
-apiVersion: rbac.authorization.k8s.io/v1
-metadata:
-  name: influx:telegraf
-aggregationRule:
-  clusterRoleSelectors:
-    - matchLabels:
-        rbac.authorization.k8s.io/aggregate-view-telegraf: "true"
-    - matchLabels:
-        rbac.authorization.k8s.io/aggregate-to-view: "true"
-rules: []
----
+#kind: ClusterRole
+#apiVersion: rbac.authorization.k8s.io/v1
+#metadata:
+#  name: influx:cluster:viewer
+#  labels:
+#    rbac.authorization.k8s.io/aggregate-view-telegraf: "true"
+#rules:
+#  - apiGroups: [""]
+#    resources: 
+#    - persistentvolumes
+#    - nodes
+#    - deployments
+#    - services
+#    - pods
+#    - statefulsets
+#    - daemonsets
+#    - persistentvolumeclaims
+#    - ingresses
+#    verbs: ["get", "list"]
+#---
+#kind: ClusterRole
+#apiVersion: rbac.authorization.k8s.io/v1
+#metadata:
+#  name: influx:telegraf
+#aggregationRule:
+#  clusterRoleSelectors:
+#    - matchLabels:
+#        rbac.authorization.k8s.io/aggregate-view-telegraf: "true"
+#    - matchLabels:
+#        rbac.authorization.k8s.io/aggregate-to-view: "true"
+#rules: []
+#---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: influx:telegraf:viewer
+  name: telegraf
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: influx:telegraf
+  name: cluster-admin
 subjects:
 - kind: ServiceAccount
   name: telegraf
