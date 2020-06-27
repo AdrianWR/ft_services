@@ -107,8 +107,8 @@ kubectl apply -f ./srcs/metallb/metallb.yaml
 deploy mysql
 deploy phpmyadmin
 deploy wordpress
-deploy nginx 
 deploy influxdb
 deploy grafana
+deploy nginx
 
 #minikube dashboard
