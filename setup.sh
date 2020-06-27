@@ -89,17 +89,17 @@ if [[ "$1" == "ignite" ]]; then
 
 	#--------------- start minikube -----------------#
 	echo -e "${GREEN}Starting Minikube...${NC}"
-	minikube start --driver=virtualbox		\
+	minikube start --driver=virtualbox				\
+				   --memory 3000   					\
+				   --bootstrapper=kubeadm			\
+				   --extra-config=kubelet.authentication-token-webhook=true \
 				   --extra-config=apiserver.service-node-port-range=3000-35000
-				   #--bootstrapper=kubeadm	\
-	  		       #--extra-config=kubelet.authentication-token-webhook=true \
-	  			   #--extra-config=kubelet.rotate-server-certificates=true	\
 	minikube addons enable metallb
 	minikube addons enable dashboard
 	minikube addons enable metrics-server
 fi
 
-#------------------- apply yamls ---------------------#
+#------------------- Apply YAMLs ---------------------#
 
 eval $(minikube docker-env)
 
