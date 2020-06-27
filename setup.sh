@@ -94,13 +94,9 @@ if [[ "$1" == "ignite" ]]; then
 				   #--bootstrapper=kubeadm	\
 	  		       #--extra-config=kubelet.authentication-token-webhook=true \
 	  			   #--extra-config=kubelet.rotate-server-certificates=true	\
+	minikube addons enable metallb
 	minikube addons enable dashboard
 	minikube addons enable metrics-server
-
-	kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.9.3/manifests/namespace.yaml
-	kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.9.3/manifests/metallb.yaml
-	kubectl create secret generic -n metallb-system memberlist --from-literal=secretkey="$(openssl rand -base64 128)"
-
 fi
 
 #------------------- apply yamls ---------------------#
