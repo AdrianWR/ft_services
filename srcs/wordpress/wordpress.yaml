@@ -62,6 +62,7 @@ metadata:
   labels:
     app: wordpress
 spec:
+  type: ClusterIP
   ports:
   - name: wordpress
     port: 5050
@@ -118,6 +119,6 @@ kind: Secret
 metadata:
   name: wordpress-secret
 type: Opaque
-data:
-  username: YWRtaW4=
-  password: YWRtaW4=
+stringData:
+  username: admin
+  password: admin

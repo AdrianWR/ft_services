@@ -49,13 +49,12 @@ metadata:
   labels:
     app: phpmyadmin
 spec:
-  type: NodePort
+  type: ClusterIP
   ports:
   - name: phpmyadmin
     protocol: TCP
     port: 5000
     targetPort: 80
-    nodePort: 5000
   selector:
     app: phpmyadmin
 ---
@@ -102,6 +101,6 @@ kind: Secret
 metadata:
   name: phpmyadmin-secret
 type: Opaque
-data:
-  username: YWRtaW4=
-  password: YWRtaW4=
+stringData:
+  username: admin
+  password: admin

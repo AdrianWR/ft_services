@@ -6,7 +6,7 @@
 #    By: aroque <aroque@student.42sp.org.br>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/06/26 17:14:18 by aroque            #+#    #+#              #
-#    Updated: 2020/06/27 18:19:17 by aroque           ###   ########.fr        #
+#    Updated: 2020/06/28 22:53:35 by aroque           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -71,8 +71,8 @@ spec:
   selector:
     app: influxdb
   ports:
-  - name: influxdb
-    port: 8086
+  - port: 8086
+    targetPort: 8086
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -103,7 +103,7 @@ data:
   kube_inventory.conf: |
     [[inputs.kube_inventory]]
     url = "https://kubernetes"
-    resource_include = ["kubernetes_pod_container"]
+    namespace = "default"
     insecure_skip_verify = true
 ---
 apiVersion: v1

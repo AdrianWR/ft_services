@@ -1,8 +1,5 @@
 #!/bin/sh
 
-#SSH_USER=admin
-#SSH_PASS=admin
-
 mkdir -p /var/run/nginx
 
 ssh-keygen -A
