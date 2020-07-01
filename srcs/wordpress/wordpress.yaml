@@ -27,12 +27,12 @@ spec:
             secretKeyRef:
               name: mysql-secret
               key: password
-        - name: WORDPRESS_USERNAME
+        - name: USERNAME
           valueFrom:
             secretKeyRef:
               name: wordpress-secret
               key: username
-        - name: WORDPRESS_PASSWORD
+        - name: PASSWORD
           valueFrom:
             secretKeyRef:
               name: wordpress-secret
@@ -77,8 +77,8 @@ metadata:
 data:
   wp-config.php: |
     <?php
-    /*define( 'WP_SITEURL',       '/wordpress/'  );
-    define( 'WP_HOME',          '/wordpress/'  );*/
+    define( 'WP_SITEURL',       '/wordpress/'  );
+    define( 'WP_HOME',          '/wordpress/'  );
     define( 'DB_NAME',          'wordpress'  );
     define( 'DB_USER',          'root'  );
     define( 'DB_PASSWORD',      'admin'  );

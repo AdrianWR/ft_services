@@ -5,6 +5,8 @@ if [[ ! -d /var/run/lighttpd ]]; then
 	chown -R lighttpd:lighttpd /var/run/lighttpd
 fi
 
+sed -i "/server.username/s/lighttpd/$USERNAME/g" /etc/lighttpd/lighttpd.conf
+sed -i "/server.groupname/s/lighttpd/$USERNAME/g" /etc/lighttpd/lighttpd.conf
 sed -i '/"mod_fastcgi.conf"/s/^#*\s*//g' /etc/lighttpd/lighttpd.conf
 sed -i '/bin-path/s/\<php-cgi\>/php-cgi7/g' /etc/lighttpd/mod_fastcgi.conf
 
@@ -16,7 +18,7 @@ if [[ ! -f /var/www/localhost/htdocs/index.php ]]; then
 	tfile=`mktemp`
 	cat > $tfile << EOF
 CREATE DATABASE IF NOT EXISTS wordpress;
-GRANT ALL PRIVILEGES ON wordpress.* TO '$WORDPRESS_USERNAME'@'localhost' IDENTIFIED BY '$WORDPRESS_PASSWORD';
+GRANT ALL PRIVILEGES ON wordpress.* TO '$USERNAME'@'localhost' IDENTIFIED BY '$WORDPRESS_PASSWORD';
 FLUSH PRIVILEGES;
 EOF
 
@@ -27,7 +29,11 @@ EOF
 
 fi
 
-chmod -R 755 /var/www/localhost/
-chown -R lighttpd:lighttpd /var/www/localhost
+adduser --no-create-home -D $USERNAME
+echo "$USERNAME:$PASSWORD" | chpasswd
+chmod -R 755 /var/www/
+chown -R $USERNAME:$USERNAME /var/www/localhost	\
+							 /var/log/lighttpd	\
+							 /var/run/lighttpd
 
-/usr/sbin/lighttpd -D -f /etc/lighttpd/lighttpd.conf
+lighttpd -D -f /etc/lighttpd/lighttpd.conf

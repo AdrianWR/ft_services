@@ -37,15 +37,15 @@ spec:
         volumeMounts:
         - name: ftps-config
           mountPath: /etc/vsftpd
-        - name: ftps-persistent-storage
-          mountPath: /home
+        - name: wordpress-persistent-storage
+          mountPath: /home/admin
       volumes:
         - name: ftps-config
           configMap:
             name: ftps-config
-        - name: ftps-persistent-storage
+        - name: wordpress-persistent-storage
           persistentVolumeClaim:
-            claimName: ftps-pv-claim
+            claimName: wordpress-pv-claim
 ---
 apiVersion: v1
 kind: Service
@@ -94,7 +94,7 @@ data:
     ssl_ciphers=HIGH
     pasv_enable=YES
     pasv_promiscuous=YES
-    pasv_address=192.168.99.100
+    pasv_address=192.168.99.101
     pasv_min_port=30000
     pasv_max_port=30000
     rsa_cert_file=/etc/ssl/certs/vsftpd.crt
