@@ -90,6 +90,5 @@ kind: Secret
 metadata:
   name: mysql-secret
 type: Opaque
-data:
-  username: cm9vdAo=
-  password: YWRtaW4=
+stringData:
+  password: admin
