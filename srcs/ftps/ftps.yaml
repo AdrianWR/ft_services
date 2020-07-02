@@ -27,18 +27,18 @@ spec:
         - name: USERNAME
           valueFrom:
             secretKeyRef:
-              name: ftps-secret
+              name: wordpress-secret
               key: username
         - name: PASSWORD
           valueFrom:
             secretKeyRef:
-              name: ftps-secret
+              name: wordpress-secret
               key: password
         volumeMounts:
         - name: ftps-config
           mountPath: /etc/vsftpd
         - name: wordpress-persistent-storage
-          mountPath: /home/admin
+          mountPath: /var/ftp
       volumes:
         - name: ftps-config
           configMap:
@@ -73,9 +73,6 @@ data:
   vsftpd.conf: |
     anonymous_enable=NO
     local_enable=YES
-    userlist_deny=NO
-    userlist_enable=YES
-    userlist_file=/etc/vsftpd/user_list
     write_enable=YES
     local_umask=022
     dirmessage_enable=YES
@@ -99,26 +96,3 @@ data:
     pasv_max_port=30000
     rsa_cert_file=/etc/ssl/certs/vsftpd.crt
     rsa_private_key_file=/etc/ssl/private/vsftpd.key
-  user_list: |
-    admin
----
-apiVersion: v1
-kind: Secret
-metadata:
-  name: ftps-secret
-stringData:
-  username: admin
-  password: admin
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: ftps-pv-claim
-  labels:
-    app: ftps
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 1Gi
