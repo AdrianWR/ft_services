@@ -21,19 +21,12 @@ spec:
         imagePullPolicy: Never
         ports:
         - containerPort: 80
-        env:
-        - name: MYSQL_ROOT_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: mysql-secret
-              key: password
         volumeMounts:
         - name: phpmyadmin-config
           mountPath: /var/www/localhost/htdocs/config.inc.php
           subPath: config.inc.php
         - name: phpmyadmin-persistent-storage
           mountPath: /var/www/localhost/htdocs
-          subPath: htdocs
       volumes:
       - name: phpmyadmin-config
         configMap:
@@ -68,15 +61,9 @@ data:
     $i = 0;
 
     $i++;
-    $cfg['Servers'][$i]['verbose'] = 'phpmyadmin';
     $cfg['Servers'][$i]['host'] = 'mysql';
-    $cfg['Servers'][$i]['port'] = '';
-    $cfg['Servers'][$i]['socket'] = '';
-    $cfg['Servers'][$i]['auth_type'] = 'cookie';
-    $cfg['Servers'][$i]['user'] = 'root';
-    $cfg['Servers'][$i]['password'] = '';
 
-    $cfg['blowfish_secret'] = '}aKfm,xyb(CwN)pTsy`-R)\'4`Jx+9|';
+    $cfg['blowfish_secret'] = 'i0ULtq/xlL:x;F7AjIYH=2I82cI[Vrly';
     $cfg['DefaultLang'] = 'en';
     $cfg['ServerDefault'] = 1;
     $cfg['UploadDir'] = '';
@@ -95,12 +82,3 @@ spec:
   resources:
     requests:
       storage: 1Gi
----
-apiVersion: v1
-kind: Secret
-metadata:
-  name: phpmyadmin-secret
-type: Opaque
-stringData:
-  username: admin
-  password: admin
