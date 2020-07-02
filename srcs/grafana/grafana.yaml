@@ -16,13 +16,15 @@ spec:
         app: grafana
     spec:
       containers:
-      - image: grafana-image
-        name: grafana
+      - name: grafana
+        image: grafana-image
         imagePullPolicy: Never
         volumeMounts:
         - name: grafana-config
           mountPath: /usr/share/grafana/conf/custom.ini
           subPath: custom.ini
+        - name: provisioning
+          mountPath: /usr/share/grafana/conf/provisioning
       volumes:
       - name: grafana-config
         configMap:
@@ -30,7 +32,14 @@ spec:
           items:
           - key: custom.ini
             path: custom.ini
-
+      - name: provisioning
+        configMap:
+          name: grafana-config
+          items:
+          - key: dashboards.yml
+            path: dashboards/dashboards.yml
+          - key: datasources.yml
+            path: datasources/datasources.yml
 ---
 apiVersion: v1
 kind: Service
@@ -40,11 +49,11 @@ metadata:
     app: grafana
 spec:
   type: ClusterIP
-  ports:
-    - port: 3000
-      targetPort: 3000
   selector:
     app: grafana
+  ports:
+  - port: 3000
+    targetPort: 3000
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -63,3 +72,28 @@ data:
     whitelist =
     headers =
     enable_login_token = false
+  datasources.yml: |
+    apiVersion: 1
+    datasources:
+    - name: InfluxDB
+      type: influxdb
+      access: proxy
+      database: telegraf
+      isDefault: true
+      user: root
+      password: password
+      url: http://influxdb:8086
+  dashboards.yml: |
+    apiVersion: 1
+    providers:
+    - name: 'influxdb'
+      orgId: 1
+      folder: ''
+      folderUid: ''
+      type: file
+      disableDeletion: false
+      editable: true
+      updateIntervalSeconds: 10
+      allowUiUpdates: true
+      options:
+        path: /usr/share/grafana/public/dashboards

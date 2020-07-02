@@ -22,14 +22,6 @@ function deploy()
 	return 0
 }
 
-#----------------- set colors -------------------#
-ORANGE="\033[0;31m "
-RED="\033[0;31m "
-GREEN="\n\033[0;92m "
-CYAN="\033[0;36m "
-MAGENTA="\033[0;95m "
-NC="\033[0m" # No Color
-
 if [[ "$1" == "ignite" ]]; then
 
 	#------------------- docker ---------------------#
@@ -88,11 +80,9 @@ if [[ "$1" == "ignite" ]]; then
 	#sudo usermod -aG docker $USER
 
 	#--------------- start minikube -----------------#
-	echo -e "${GREEN}Starting Minikube...${NC}"
-	minikube start --driver=virtualbox				\
-				   --memory 3000   					\
-				   --bootstrapper=kubeadm			\
-				   --extra-config=kubelet.authentication-token-webhook=true \
+	minikube start --driver=virtualbox											\
+				   --bootstrapper=kubeadm										\
+				   --extra-config=kubelet.authentication-token-webhook=true		\
 				   --extra-config=apiserver.service-node-port-range=3000-35000
 	minikube addons enable metallb
 	minikube addons enable dashboard
@@ -110,5 +100,6 @@ deploy wordpress
 deploy influxdb
 deploy grafana
 deploy nginx
+deploy ftps
 
 #minikube dashboard
