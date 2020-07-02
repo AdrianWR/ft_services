@@ -43,7 +43,6 @@ spec:
           subPath: wp-config.php
         - name: wordpress-persistent-storage
           mountPath: /var/www/localhost/htdocs
-          subPath: htdocs
       volumes:
       - name: wp-config
         configMap:
@@ -80,17 +79,19 @@ data:
     define( 'WP_SITEURL',       '/wordpress/'  );
     define( 'WP_HOME',          '/wordpress/'  );
     define( 'DB_NAME',          'wordpress'  );
-    define( 'DB_USER',          'root'  );
-    define( 'DB_PASSWORD',      'admin'  );
+    define( 'DB_USER',          getenv('USERNAME'));
+    define( 'DB_PASSWORD',      getenv('PASSWORD'));
     define( 'DB_HOST',          'mysql'  );
     define( 'DB_CHARSET',       'utf8mb4'  );
-    define( 'DB_COLLATE',       ''  );
-    define( 'AUTH_KEY',         '' );
-    define( 'SECURE_AUTH_KEY',  '' );
-    define( 'LOGGED_IN_KEY',    '' );
-    define( 'SECURE_AUTH_SALT', '' );
-    define( 'LOGGED_IN_SALT',   '' );
-    define( 'NONCE_SALT',       '' );
+    define( 'DB_COLLATE',       '' );
+	define( 'AUTH_KEY',         '|WnO`(KpO0}T|&YE/6M6:jD]:i7^mU> q>8m|]uzQ|_ZWNG`=Nx%5$~ pxQ{Zf.]');
+	define( 'SECURE_AUTH_KEY',  'Lq<{-3 VVvz1V($7=V~;lZjE4I;uO-N_$Bu-C`R>GR2N&uTRh4+q{k*Hb?tBfqk(');
+	define( 'LOGGED_IN_KEY',    'HvqcUkrz-AAC|2j*al!&yurK|^t}As/_Q6`qYRviP8++=QnMzF!|=1r8E;+JB~^e');
+	define( 'NONCE_KEY',        '}*<wOAI__t`=tfR9&+X}Npg+_=0jiM`klyXDGa)rp~iFw-jWwKh$$I[*h=u,pVwn');
+	define( 'AUTH_SALT',        'H<|TB.}.1;!uFen&z&/8/vAt>$~R bkQu$DW{u}@-A;u13Hk%J~]g+PtOT2+>HhH');
+	define( 'SECURE_AUTH_SALT', '+z~LPwq)r;q01%w6w6Y4O^wm*$WC4sF.hT|tH, dWB(l%<:}$zFjX]R-DY<.|3>$');
+	define( 'LOGGED_IN_SALT',   'k)0t0 DiV|=mOUw)1Je76zpZ9]/?|66t3`*|]H3+?V&h(ZJ~pz-`LL-AKy~jGNjz');
+	define( 'NONCE_SALT',       '?!V/n-AJW}=bT|L.i7/yh5W}Gg?x~hR:JSKLv@vX8:fIa`;mC&~#wHU8flh%8}Z^');
     $table_prefix = 'wp_';
     define( 'WP_DEBUG', false  );
     if ( ! defined( 'ABSPATH'  )  ) {

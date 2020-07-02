@@ -17,9 +17,10 @@ if [[ ! -f /var/www/localhost/htdocs/index.php ]]; then
 
 	tfile=`mktemp`
 	cat > $tfile << EOF
-CREATE DATABASE IF NOT EXISTS wordpress;
-GRANT ALL PRIVILEGES ON wordpress.* TO '$USERNAME'@'localhost' IDENTIFIED BY '$WORDPRESS_PASSWORD';
 FLUSH PRIVILEGES;
+CREATE DATABASE IF NOT EXISTS wordpress;
+CREATE USER '$USERNAME'@'%' IDENTIFIED BY '$PASSWORD';
+GRANT ALL PRIVILEGES ON wordpress.* TO '$USERNAME'@'%' WITH GRANT OPTION;
 EOF
 
 	mysql -hmysql -uroot -p$MYSQL_ROOT_PASSWORD < $tfile
