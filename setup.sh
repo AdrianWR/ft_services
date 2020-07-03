@@ -22,7 +22,7 @@ function deploy()
 	return 0
 }
 
-if [[ "$1" == "ignite" ]]; then
+if [[ "$1" == "restart" ]]; then
 
 	#------------------- docker ---------------------#
 
