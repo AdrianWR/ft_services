@@ -16,6 +16,8 @@ Before launching the setup script, the following dependencies must be satisfied:
 
 To install the cluster on a `minikube` instance, execute the script as `./setup.sh`. This script was tested on Ubuntu Linux 20.04; other opertaional systems may not be supported.
 
+To access your cluster services, go to a broswer and access the IP `192.168.99.100`. In this home page, there will be several links with redirections to other services of the cluster, like the Wordpress blog and the Grafana metrics visualization tool. To access the FTPS service, run your client on the IP `192.168.99.101`.
+
 ## The Cluster
 
 ![img](srcs/ft_services.png)
