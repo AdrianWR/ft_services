@@ -2,10 +2,19 @@
 Webserver cluster running with Docker containers and Kubernetes
 
 ## About
-FT Services is a project proposed in the 42 Schools curriculum, consisting on the implementation of a series of web services running on distinct containers orchestrated with Kubernetes. 
+FT Services is a project proposed in the 42 Schools curriculum, consisting on the implementation of a series of web services running on distinct containers orchestrated with Kubernetes.
 
 ## Note to 42 Students!
 This cluster architecture doesn't represent the actual subject of the ft_services curriculim project, so beware of getting some ideas to run on your own projects. As my actual and personal view on the subject, it seems that each HTTP service must be exposed individually with a `LoadBalancer` service type. In my setup, the only HTTP service exposed is the NGINX web server, and other services can be reached with a reverse proxy configuration. More details can be seen at the Cluster Architecture section.
+
+## Installing and Running
+Before launching the setup script, the following dependencies must be satisfied:
+- kubectl
+- minikube
+- Docker
+- Virtualbox
+
+To install the cluster on a `minikube` instance, execute the script as `./setup.sh`. This script was tested on Ubuntu Linux 20.04; other opertaional systems may not be supported.
 
 ## The Cluster
 
