@@ -29,9 +29,16 @@ Relational database to handle data needs for the Wordpress content website. It's
 Cluster content management system, served with lighttpd web server on container port 80. The processing of dynamic web pages is made with the FastCGI module and PHP, with a *wordpress* table created on the MySQL service. The pod claims a persistent volume on `/var/www`, with 1Gb storage, to maintain web documents and to share the volume with the FTPS service. The service is exposed as `ClusterIP`, being available on port **5050**.
 
 ### PHPMyAdmin
-### InfluxDB
-### Grafana
-### FTPS Server
+Database management system, with graphical user interface on the browser. Doesn't allow access to the **root** user. Available on port **5000**, exposed as a `ClusterIP` service.
 
-## Cluster Architecture
+### InfluxDB
+Time-series database system, which stores cluster metrics data to be available to the Grafana pod as a visualization tool. Requires initilization of the **Telegraf** process, with support to `kubernetes` and `kube-inventory` plugins and with a dedicated service account inside the pod. The telegraf agent gather the cluster metrics through the Kubernetes API. Exposed as a `ClusterIP` service on the port **8086**.
+
+### Grafana
+Metrics visualization tool, exposed with a WSGI server on port **3000**, as a `ClusterIP` service. The Grafana service allows the visualziation of containers and general cluster metrics, provisiened the correct dashboards and datasets.
+
+### FTPS Server
+Simple and secure FTP service with SSL security availability, connected to the mounting point on the Wordpress data directory. Therefore, Wordpress users and administrators may upload or download data from the CMS, if the respective permissions were granted. Doesn't allow anonymous users on the FTP server. Runs on passive mode through the port **30000**, with connections on ports **20** and **21** as well. Exposed with a dedicated `LoadBalancer` service type.
+
+## Cluster Architecture Visualization
 ![img](srcs/ft_services.png)
