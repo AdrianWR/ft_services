@@ -7,7 +7,9 @@ FT Services is a project proposed in the 42 Schools curriculum, consisting on th
 ## Note to 42 Students!
 This cluster architecture doesn't represent the actual subject of the ft_services curriculim project, so beware of getting some ideas to run on your own projects. As my actual and personal view on the subject, it seems that each HTTP service must be exposed individually with a `LoadBalancer` service type. In my setup, the only HTTP service exposed is the NGINX web server, and other services can be reached with a reverse proxy configuration. More details can be seen at the Cluster Architecture section.
 
-## Installing and Running
+## Getting Started
+
+### Installation
 Before launching the setup script, the following dependencies must be satisfied:
 - kubectl
 - minikube
@@ -16,6 +18,7 @@ Before launching the setup script, the following dependencies must be satisfied:
 
 To install the cluster on a `minikube` instance, execute the script as `./setup.sh`. This script was tested on Ubuntu Linux 20.04; other opertaional systems may not be supported.
 
+### Running the Cluster
 To access your cluster services, go to a broswer and access the IP `192.168.99.100`. In this home page, there will be several links with redirections to other services of the cluster, like the Wordpress blog and the Grafana metrics visualization tool. To access the FTPS service, run your client on the IP `192.168.99.101`.
 
 ## The Cluster
