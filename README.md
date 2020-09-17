@@ -18,6 +18,8 @@ To install the cluster on a `minikube` instance, execute the script as `./setup.
 
 ## The Cluster
 
+![img](srcs/ft_services.png)
+
 This cluster is composed of several Docker containers, all of them built from the Alpine Linux official Docker Hub image. From this perspective, each container has a different set of applications installed, reflecting the services to be exposed. The 42 School give us students freedom to choose the best tool to deploy their cluster. In this project, it has been choosen the use of the Minikube local cluster deployment tool. The **minikube** configuration is very particular to this set of applications, so here's a quick explanation of this setup:
 
 - use of Virtual Box driver;
@@ -48,6 +50,3 @@ Metrics visualization tool, exposed with a WSGI server on port **3000**, as a `C
 
 ### FTPS Server
 Simple and secure FTP service with SSL security availability, connected to the mounting point on the Wordpress data directory. Therefore, Wordpress users and administrators may upload or download data from the CMS, if the respective permissions were granted. Doesn't allow anonymous users on the FTP server. Runs on passive mode through the port **30000**, with connections on ports **20** and **21** as well. Exposed with a dedicated `LoadBalancer` service type.
-
-## Cluster Architecture Visualization
-![img](srcs/ft_services.png)
