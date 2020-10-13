@@ -80,7 +80,7 @@ if [[ "$1" == "restart" ]]; then
 	#sudo usermod -aG docker $USER
 
 	#--------------- start minikube -----------------#
-	minikube start --driver=virtualbox											\
+	minikube start --driver=docker											\
 				   --bootstrapper=kubeadm										\
 				   --extra-config=kubelet.authentication-token-webhook=true		\
 				   --extra-config=apiserver.service-node-port-range=3000-35000
