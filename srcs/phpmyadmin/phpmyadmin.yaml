@@ -22,15 +22,26 @@ spec:
         ports:
         - containerPort: 80
         volumeMounts:
-        - name: phpmyadmin-config
+        - name: config-inc-php
           mountPath: /var/www/localhost/htdocs/config.inc.php
           subPath: config.inc.php
+        - name: default-conf
+          mountPath: /etc/nginx/conf.d
         - name: phpmyadmin-persistent-storage
           mountPath: /var/www/localhost/htdocs
       volumes:
-      - name: phpmyadmin-config
+      - name: config-inc-php
         configMap:
            name: phpmyadmin-config
+           items:
+           - key: config.inc.php
+             path: config.inc.php
+      - name: default-conf
+        configMap:
+           name: phpmyadmin-config
+           items:
+           - key: default.conf
+             path: default.conf
       - name: phpmyadmin-persistent-storage
         persistentVolumeClaim:
           claimName: phpmyadmin-pv-claim
@@ -41,15 +52,17 @@ metadata:
   name: phpmyadmin
   labels:
     app: phpmyadmin
+  annotations:
+    metallb.universe.tf/allow-shared-ip: address-pool
 spec:
-  type: ClusterIP
+  type: LoadBalancer
+  selector:
+    app: phpmyadmin
   ports:
   - name: phpmyadmin
     protocol: TCP
     port: 5000
     targetPort: 80
-  selector:
-    app: phpmyadmin
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -62,13 +75,27 @@ data:
 
     $i++;
     $cfg['Servers'][$i]['host'] = 'mysql';
-
     $cfg['blowfish_secret'] = 'i0ULtq/xlL:x;F7AjIYH=2I82cI[Vrly';
-    $cfg['DefaultLang'] = 'en';
-    $cfg['ServerDefault'] = 1;
-    $cfg['UploadDir'] = '';
-    $cfg['SaveDir'] = '';
-    $cfg['PmaAbsoluteUri'] = '/phpmyadmin/';
+  default.conf: |
+    server {
+
+      location / {
+        root /var/www/localhost/htdocs;
+        index index.php index.html index.htm;
+        location ~ ^/(.+\.php)$ {
+          try_files $uri =404;
+          root /var/www/localhost/htdocs;
+          fastcgi_pass 127.0.0.1:9000;
+          fastcgi_index index.php;
+          fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+          include /etc/nginx/fastcgi_params;
+        }
+
+        location ~* ^/(.+\.(jpg|jpeg|gif|css|png|js|ico|html|xml|txt))$ {
+          root /var/www/localhost/htdocs;
+        }
+      }
+    }
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim

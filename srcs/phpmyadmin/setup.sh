@@ -2,13 +2,9 @@
 
 PMA_PACKAGE=phpMyAdmin-$PMA_VERSION-all-languages.tar.gz
 
-if [[ ! -d /var/run/lighttpd ]]; then
-	mkdir -p /var/run/lighttpd
-	chown -R lighttpd:lighttpd /var/run/lighttpd
+if [[ ! -d /var/run/nginx ]]; then
+	mkdir -p /var/run/nginx
 fi
-
-sed -i '/"mod_fastcgi.conf"/s/^#*\s*//g' /etc/lighttpd/lighttpd.conf
-sed -i '/bin-path/s/\<php-cgi\>/php-cgi7/g' /etc/lighttpd/mod_fastcgi.conf
 
 if [[ ! -f /var/www/localhost/htdocs/index.php ]]; then
 
@@ -17,7 +13,7 @@ if [[ ! -f /var/www/localhost/htdocs/index.php ]]; then
 
 fi
 
-chmod -R 755 /var/www/localhost/
-chown -R lighttpd:lighttpd /var/www/localhost
+#chown -R nginx:nginx /var/www/localhost
+#chmod -R 755 /var/www/localhost/
 
-lighttpd -D -f /etc/lighttpd/lighttpd.conf
+php-fpm7 & nginx -g "daemon off;"

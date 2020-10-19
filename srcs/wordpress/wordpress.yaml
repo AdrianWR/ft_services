@@ -39,10 +39,12 @@ spec:
               key: password
         volumeMounts:
         - name: wp-config
-          mountPath: /var/www/localhost/htdocs/wp-config.php
+          mountPath: /var/www/wordpress/wp-config.php
           subPath: wp-config.php
+        - name: wp-nginx-vhost-conf
+          mountPath: /etc/nginx/conf.d
         - name: wordpress-persistent-storage
-          mountPath: /var/www/localhost/htdocs
+          mountPath: /var/www/wordpress
       volumes:
       - name: wp-config
         configMap:
@@ -50,6 +52,12 @@ spec:
           items:
           - key: wp-config.php
             path: wp-config.php
+      - name: wp-nginx-vhost-conf
+        configMap:
+          name: wordpress-config
+          items:
+          - key: wp-vhost.conf
+            path: default.conf
       - name: wordpress-persistent-storage
         persistentVolumeClaim:
           claimName: wordpress-pv-claim
@@ -60,14 +68,16 @@ metadata:
   name: wordpress
   labels:
     app: wordpress
+  annotations:
+    metallb.universe.tf/allow-shared-ip: address-pool
 spec:
-  type: ClusterIP
+  type: LoadBalancer
+  selector:
+    app: wordpress
   ports:
   - name: wordpress
     port: 5050
     targetPort: 80
-  selector:
-    app: wordpress
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -76,31 +86,65 @@ metadata:
 data:
   wp-config.php: |
     <?php
-    define( 'WP_SITEURL',       '/wordpress/'  );
-    define( 'WP_HOME',          '/wordpress/'  );
-    define( 'DB_NAME',          'wordpress'  );
-    define( 'DB_USER',          getenv('USERNAME'));
-    define( 'DB_PASSWORD',      getenv('PASSWORD'));
-    define( 'DB_HOST',          'mysql'  );
-    define( 'DB_CHARSET',       'utf8mb4'  );
-    define( 'DB_COLLATE',       '' );
-    define( 'AUTH_KEY',         '|WnO`(KpO0}T|&YE/6M6:jD]:i7^mU> q>8m|]uzQ|_ZWNG`=Nx%5$~ pxQ{Zf.]');
-    define( 'SECURE_AUTH_KEY',  'Lq<{-3 VVvz1V($7=V~;lZjE4I;uO-N_$Bu-C`R>GR2N&uTRh4+q{k*Hb?tBfqk(');
-    define( 'LOGGED_IN_KEY',    'HvqcUkrz-AAC|2j*al!&yurK|^t}As/_Q6`qYRviP8++=QnMzF!|=1r8E;+JB~^e');
-    define( 'NONCE_KEY',        '}*<wOAI__t`=tfR9&+X}Npg+_=0jiM`klyXDGa)rp~iFw-jWwKh$$I[*h=u,pVwn');
-    define( 'AUTH_SALT',        'H<|TB.}.1;!uFen&z&/8/vAt>$~R bkQu$DW{u}@-A;u13Hk%J~]g+PtOT2+>HhH');
-    define( 'SECURE_AUTH_SALT', '+z~LPwq)r;q01%w6w6Y4O^wm*$WC4sF.hT|tH, dWB(l%<:}$zFjX]R-DY<.|3>$');
-    define( 'LOGGED_IN_SALT',   'k)0t0 DiV|=mOUw)1Je76zpZ9]/?|66t3`*|]H3+?V&h(ZJ~pz-`LL-AKy~jGNjz');
-    define( 'NONCE_SALT',       '?!V/n-AJW}=bT|L.i7/yh5W}Gg?x~hR:JSKLv@vX8:fIa`;mC&~#wHU8flh%8}Z^');
+    define( 'DB_NAME', 'wordpress' );
+    define( 'DB_USER', 'admin' );
+    define( 'DB_PASSWORD', 'admin' );
+    define( 'DB_HOST', 'mysql' );
+    define( 'DB_CHARSET', 'utf8mb4' );
+    define( 'DB_COLLATE', '' );
+    
+    define( 'AUTH_KEY',         'vPw^D<?x4WB+*,W3/8CnE.Fcm2o M7FEc!X!,Sk_igiS4r6<##*;mU)J]d{4bY=N' );
+    define( 'SECURE_AUTH_KEY',  ',:rf^si7) s}$!@}JSD 7;.[!Y#rl{+3g?x.[-Sb~4g!bP=Ad%*N`mP3o;xv8 z9' );
+    define( 'LOGGED_IN_KEY',    '}!;}m0fPt[6RW]mO%ow}eCVtQ9]-ny!ri;3H5Rxc+E3O1T]8_K&gmm7~8ZV5{$m)' );
+    define( 'NONCE_KEY',        'I({Jb_R5Kfea-B-8Ddf[Cg`;dyL {r%@4Jpv6Qt[>wBD$tMrN+d+p3:rt_LXFn]t' );
+    define( 'AUTH_SALT',        'X8eFc[SK9M8fi^Mid+uGN?OcWzW;t[x^%i5C1/9.{C pxS*`F&w9m< lLuxu*SPN' );
+    define( 'SECURE_AUTH_SALT', 'JX~4?ngO!DW%FxS|q{HA_)GEmCZ5}x%e}Z:xGur#@KOvA>fnKwOQ*8!d;mk*z<S;' );
+    define( 'LOGGED_IN_SALT',   'av_&2l)Z*8H/yNLm dv3}Z!9iDV6V#i2&(HTHwhg?]>Xb9a4&S7PdZs_5p<kqq5(' );
+    define( 'NONCE_SALT',       'Y//^8;#si4`-H=Kbx`&t3^]K ,do1pV>>IK2sA>^`R|)j*^+UZg]MfpH<WlTz/}]' );
+    
     $table_prefix = 'wp_';
-    define( 'WP_DEBUG', false  );
-    if ( ! defined( 'ABSPATH'  )  ) {
-      define( 'ABSPATH', __DIR__ . '/'  );
+    
+    define( 'WP_DEBUG', false );
+    if ( ! defined( 'ABSPATH' ) ) {
+    	define( 'ABSPATH', __DIR__ . '/' );
     }
     require_once ABSPATH . 'wp-settings.php';
-    if ( ! empty( $_SERVER['HTTP_X_FORWARDED_HOST']  )  ) {
-      $_SERVER['HTTP_HOST'] = $_SERVER['HTTP_X_FORWARDED_HOST'];
+
+  wp-vhost.conf: |
+    upstream php {
+      server unix:/tmp/php-cgi.socket;
+      server 127.0.0.1:9000;
     }
+
+    server {
+
+      server_name _;
+      root /var/www/wordpress;
+      index index.php;
+
+      location = /favicon.ico {
+        log_not_found off;
+        access_log off;
+      }
+
+      location / {
+        try_files $uri $uri/ /index.php?$args;
+      }
+
+      location ~ \.php$ {
+        #NOTE: You should have "cgi.fix_pathinfo = 0;" in php.ini
+        include fastcgi_params;
+        fastcgi_intercept_errors on;
+        fastcgi_pass php;
+        fastcgi_param  SCRIPT_FILENAME $document_root$fastcgi_script_name;
+      }
+
+      location ~* \.(js|css|png|jpg|jpeg|gif|ico)$ {
+        expires max;
+        log_not_found off;
+      }
+    }
+
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim

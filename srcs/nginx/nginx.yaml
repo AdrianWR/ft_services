@@ -44,6 +44,8 @@ metadata:
   name: nginx
   labels:
     app: nginx
+  annotations:
+    metallb.universe.tf/allow-shared-ip: address-pool
 spec:
   type: LoadBalancer
   selector:
@@ -81,22 +83,21 @@ data:
         listen  [::]:443    ssl;
 
         server_name           _;
-        ssl_certificate       /ssl/cert.crt;
-        ssl_certificate_key   /ssl/cert.key;
         index                 index.html;
         root                  /var/www/localhost/htdocs;
+        ssl_certificate       /ssl/cert.crt;
+        ssl_certificate_key   /ssl/cert.key;
 
         location / {
             try_files $uri $uri/ =404;
         }
 
         location /wordpress/ {
-            proxy_pass  http://wordpress:5050/;
-            rewrite     ^([^.]*[^/])$ $1/ permanent;
+            return 307  http://$host:5050/;
         }
 
         location /phpmyadmin/ {
-            proxy_pass  http://phpmyadmin:5000/;
+            proxy_pass  http://$host:5000/;
         }
 
         location /grafana/ {
@@ -105,9 +106,3 @@ data:
             proxy_set_header    X-WEBAUTH-USER admin;
         }
     }
-  proxy.conf:
-    proxy_set_header    Host $host;
-    proxy_set_header    X-Real-IP $host;
-    proxy_set_header    X-Forwarded-For $proxy_add_x_forwarded_for;
-    proxy_set_header    X-Forwarded-Proto $scheme;
-    proxy_set_header    X-Forwarded-Host $host;

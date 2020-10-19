@@ -53,16 +53,16 @@ metadata:
   name: ftps
   labels:
     app: ftps
+  annotations:
+    metallb.universe.tf/allow-shared-ip: address-pool
 spec:
   type: LoadBalancer
   selector:
     app: ftps
   ports:
-  - name: ftp-data
-    port: 20
   - name: ftp-connection
     port: 21
-  - name: pftp-data-0
+  - name: pftp-data
     port: 30000
 ---
 apiVersion: v1
@@ -91,7 +91,7 @@ data:
     ssl_ciphers=HIGH
     pasv_enable=YES
     pasv_promiscuous=YES
-    pasv_address=192.168.99.101
+    pasv_address=172.17.0.4
     pasv_min_port=30000
     pasv_max_port=30000
     rsa_cert_file=/etc/ssl/certs/vsftpd.crt
