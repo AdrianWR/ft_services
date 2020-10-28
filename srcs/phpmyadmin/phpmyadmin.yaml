@@ -23,12 +23,12 @@ spec:
         - containerPort: 80
         volumeMounts:
         - name: config-inc-php
-          mountPath: /var/www/localhost/htdocs/config.inc.php
+          mountPath: /var/www/phpmyadmin/config.inc.php
           subPath: config.inc.php
         - name: default-conf
           mountPath: /etc/nginx/conf.d
         - name: phpmyadmin-persistent-storage
-          mountPath: /var/www/localhost/htdocs
+          mountPath: /var/www/
       volumes:
       - name: config-inc-php
         configMap:
@@ -71,6 +71,7 @@ metadata:
 data:
   config.inc.php: |
     <?php
+    declare(strict_types=1);
     $i = 0;
 
     $i++;
@@ -78,22 +79,20 @@ data:
     $cfg['blowfish_secret'] = 'i0ULtq/xlL:x;F7AjIYH=2I82cI[Vrly';
   default.conf: |
     server {
+      listen 80;
+      listen [::]:80;
 
-      location / {
-        root /var/www/localhost/htdocs;
-        index index.php index.html index.htm;
-        location ~ ^/(.+\.php)$ {
-          try_files $uri =404;
-          root /var/www/localhost/htdocs;
-          fastcgi_pass 127.0.0.1:9000;
-          fastcgi_index index.php;
-          fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
-          include /etc/nginx/fastcgi_params;
-        }
+      server_name _;
+      root /var/www/phpmyadmin;
+      index index.php index.html;
+      try_files $uri $uri/ =404;
 
-        location ~* ^/(.+\.(jpg|jpeg|gif|css|png|js|ico|html|xml|txt))$ {
-          root /var/www/localhost/htdocs;
-        }
+      location ~ \.php$ { 
+        fastcgi_pass 127.0.0.1:9000;
+        fastcgi_index index.php;
+        include fastcgi.conf;
+        include fastcgi_params;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
       }
     }
 ---

@@ -6,10 +6,10 @@ if [[ ! -d /var/run/nginx ]]; then
 	mkdir -p /var/run/nginx
 fi
 
-if [[ ! -f /var/www/localhost/htdocs/index.php ]]; then
+if [[ ! -f /var/www/phpmyadmin/index.php ]]; then
 
 	curl -SL https://files.phpmyadmin.net/phpMyAdmin/$PMA_VERSION/phpMyAdmin-$PMA_VERSION-all-languages.tar.xz \
-	| tar -xJC /var/www/localhost/htdocs --strip 1
+	| tar -xJC /var/www/phpmyadmin --strip 1
 
 fi
 
