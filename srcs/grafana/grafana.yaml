@@ -64,7 +64,7 @@ metadata:
 data:
   custom.ini: |
     [server]
-    root_url = %(protocol)s://%(domain)s/grafana/
+    root_url = %(protocol)s://%(domain)s/
     [auth.proxy]
     enabled = true
     header_name = X-WEBAUTH-USER
