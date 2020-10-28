@@ -91,7 +91,7 @@ data:
     ssl_ciphers=HIGH
     pasv_enable=YES
     pasv_promiscuous=YES
-    pasv_address=172.17.0.4
+    pasv_address=192.168.49.3
     pasv_min_port=30000
     pasv_max_port=30000
     rsa_cert_file=/etc/ssl/certs/vsftpd.crt
