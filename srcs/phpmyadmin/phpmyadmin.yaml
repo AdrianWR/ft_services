@@ -77,6 +77,7 @@ data:
     $i++;
     $cfg['Servers'][$i]['host'] = 'mysql';
     $cfg['blowfish_secret'] = 'i0ULtq/xlL:x;F7AjIYH=2I82cI[Vrly';
+    $cfg['PmaAbsoluteUri'] = './';
   default.conf: |
     server {
       listen 80;
