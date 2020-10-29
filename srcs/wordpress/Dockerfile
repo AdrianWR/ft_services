@@ -14,7 +14,7 @@ RUN apk add	curl nginx mysql-client php7-fpm php7-common				\
 ENV WP_VERSION 5.4.2
 
 COPY setup.sh /tmp/
-COPY wordpress.sql /tmp/
+#COPY wordpress.sql /tmp/
 
 EXPOSE 80 5000
 
