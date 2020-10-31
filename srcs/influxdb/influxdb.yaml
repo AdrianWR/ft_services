@@ -34,7 +34,7 @@ spec:
           mountPath: /etc/influxdb.conf
           subPath: influxdb.conf
         - name: telegraf-config
-          mountPath: /etc/telegraf.conf.d
+          mountPath: /etc/telegraf/telegraf.d
         - name: influxdb-persistent-storage
           mountPath: /influxdata
       volumes:

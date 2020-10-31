@@ -7,4 +7,4 @@ export HOST_IP=$(curl -s $API_URL/api/v1/namespaces/$POD_NAMESPACE/pods/$HOSTNAM
 			     jq -r '.status.hostIP')
 
 influxd &
-telegraf --config /etc/telegraf.conf --config-directory /etc/telegraf.conf.d
+telegraf --config /etc/telegraf/telegraf.conf --config-directory /etc/telegraf/telegraf.d
